@@ -1,38 +1,215 @@
-.App {
-  text-align: center;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.wrapper {
+  min-width: 300px;
+  max-width: 800px;
+  width: 90vw;
+  margin: 0 auto;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+header {
+  height: 100px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.logo {
+  height: 30px;
+  margin-left: 1vw;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.screen {
+  background-color: rgb(228, 228, 228);
+  height: 100px;
+  margin-bottom: 5px;
+  padding: 5px;
+  text-align: right;
+}
+
+.secondary-screen {
+  padding: 15px 15px 0;
+  font-size: 12px;
+  height: 30%;
+}
+
+.main-screen {
+  font-size: 36px;
+  padding: 15px 15px 0;
+}
+
+.keyboard {
+  background-image: url('./unicorn.png');
+  height: 65vw;
+  max-height: 50vh;
+  min-height: 260px;
+  display: grid;
+  grid-template-columns: repeat(4, 25%);
+  grid-template-rows: repeat(6, 16.666%);
+  grid-template-areas:
+    'percent clearEntry clearAll deletion'
+    'fraction square squareRoot division'
+    'seven eight nine multiplication'
+    'four five six subtraction'
+    'one two three addition'
+    'negation zero dot equalSign';
+}
+
+.zero {
+  grid-area: zero;
+}
+
+.one {
+  grid-area: one;
+}
+
+.two {
+  grid-area: two;
+}
+
+.three {
+  grid-area: three;
+}
+
+.four {
+  grid-area: four;
+}
+
+.five {
+  grid-area: five;
+}
+
+.six {
+  grid-area: six;
+}
+
+.seven {
+  grid-area: seven;
+}
+
+.eight {
+  grid-area: eight;
+}
+
+.nine {
+  grid-area: nine;
+}
+
+.dot {
+  grid-area: dot;
+}
+
+.negation {
+  grid-area: negation;
+}
+
+.addition {
+  grid-area: addition;
+}
+
+.subtraction {
+  grid-area: subtraction;
+}
+
+.multiplication {
+  grid-area: multiplication;
+}
+
+.division {
+  grid-area: division;
+}
+
+.equalSign {
+  grid-area: equalSign;
+}
+
+.percent {
+  grid-area: percent;
+}
+
+.fraction {
+  grid-area: fraction;
+}
+
+.square {
+  grid-area: square;
+}
+
+.squareRoot {
+  grid-area: squareRoot;
+}
+
+.clearEntry {
+  grid-area: clearEntry;
+}
+
+.clearAll {
+  grid-area: clearAll;
+}
+
+.deletion {
+  grid-area: deletion;
+}
+
+.zero,
+.one,
+.two,
+.three,
+.four,
+.five,
+.six,
+.seven,
+.eight,
+.nine,
+.dot,
+.negation {
+  font-weight: bold;
+}
+
+.addition,
+.subtraction,
+.multiplication,
+.division,
+.percent,
+.fraction,
+.square,
+.squareRoot,
+.deletion,
+.clearEntry,
+.clearAll {
+  background-color: rgba(235, 235, 235, .9);
+}
+
+.equalSign {
+  background-color: rgba(192, 192, 192);
+}
+
+button {
+  font-size: 16px;
+  background-color: rgba(255, 255, 255, .8);
+  cursor: pointer;
+  border: solid 1px gray;
+}
+
+button:hover {
+  background-color: rgba(219, 219, 219, .95);
+}
+
+.equalSign:hover {
+  background-color: rgba(167, 167, 167, .95);
+}
+
+button:active {
+  background-color: rgba(182, 182, 182, .95);
+}
+
+.equalSign:active {
+  background-color: rgba(114, 114, 114, .95);
 }
