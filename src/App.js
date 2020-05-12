@@ -1,7 +1,7 @@
 import React from 'react';
-import './App.css';
-import logo from './logo.svg';
-import { ContextStore } from './ContextStore'
+import './styles/App.css';
+import logo from './images/logo.svg';
+import { ContextStore } from './store/ContextStore'
 
 import Screen from './components/Screen';
 import Keyboard from './components/Keyboard';

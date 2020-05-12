@@ -1,66 +1,81 @@
 export const handleNumber = (context, sign) => {
    const { mainScreen, setMainScreen, secondaryScreen, setSecondaryScreen, resetMain, setResetMain } = context
+   const secondaryLastItem = secondaryScreen[secondaryScreen.length - 1]
+
    if (sign === '0' && !mainScreen) return
-   if (sign === '0' && mainScreen && resetMain) return
-   if (sign === '0' && resetMain && secondaryScreen[secondaryScreen.length - 1] === '=') {
+
+   if (sign === '0' && resetMain && secondaryLastItem === '=') {
       setMainScreen('')
       setSecondaryScreen([])
+      if (resetMain) setResetMain(false)
    } else if (resetMain) {
-      if (secondaryScreen[secondaryScreen.length - 1] === '=') setSecondaryScreen([])
+      setMainScreen(sign)
+      if (secondaryLastItem === '=') setSecondaryScreen([])
+      setResetMain(false)
+   } else if (mainScreen === '0') {
       setMainScreen(sign)
    } else {
       setMainScreen(mainScreen + sign)
    }
-   setResetMain(false)
 }
 
 export const handleDot = (context) => {
    const { mainScreen, setMainScreen, resetMain, setResetMain } = context
-   if (mainScreen[mainScreen.length - 1] === '-') return
-   if (!mainScreen) return setMainScreen('0.')
-   if (mainScreen && resetMain) {
+   const mainLastItem = mainScreen[mainScreen.length - 1]
+
+   if (mainScreen.includes('.') && !resetMain) return
+   if (mainLastItem === '-') return
+
+   if (!mainScreen) {
+      setMainScreen('0.')
+      if (resetMain) setResetMain(false)
+   } else if (mainScreen && resetMain) {
+      setMainScreen('0.')
       setResetMain(false)
-      return setMainScreen('0.')
+   } else if (mainScreen && !resetMain) {
+      setMainScreen(mainScreen + '.')
    }
-   if (mainScreen.includes('.')) return
-   setMainScreen(mainScreen + '.')
 }
 
 export const handleNegation = (context) => {
    const { mainScreen, setMainScreen } = context
+
    if (!mainScreen || mainScreen === '0' || mainScreen === '0.') return
    mainScreen.includes('-') ? setMainScreen(mainScreen.replace('-', '')) : setMainScreen('-' + mainScreen)
 }
 
 export const handleOperation = (context, sign) => {
-
    const { mainScreen, setMainScreen, secondaryScreen, setSecondaryScreen, resetMain, setResetMain } = context
    const mainLastItem = mainScreen[mainScreen.length - 1]
    const secondaryLastItem = secondaryScreen[secondaryScreen.length - 1]
+   const hasNoBracket = secondaryScreen[secondaryScreen.length - 2] !== ')'
 
    if (mainLastItem === '.') return
    if (!mainScreen && secondaryScreen.length === 0) return
    if (sign !== '=' && resetMain) {
-      if ((sign === '*' || sign === '/') && secondaryScreen[secondaryScreen.length - 2] !== ')') {
+      if ((sign === '*' || sign === '/') && hasNoBracket) {
          return setSecondaryScreen(['(', ...secondaryScreen.slice(0, -1), ')', sign])
       } else {
          return setSecondaryScreen([...secondaryScreen.slice(0, -1), sign])
       }
    }
 
-   let score
    let main
+   let score
    let secondary
 
-   mainScreen[0] === '-' ? main = `(${mainScreen})` : main = mainScreen
+   main = mainScreen
+   if (main === '') main = '0'
+   if (main[0] === '-') main = `(${main})`
    secondaryScreen.length < 2 ? score = secondaryScreen : score = secondaryScreen.slice(0, -1)
    score = score.join('')
    if (score) score = `(${score})`
    secondaryScreen.length < 2 ? score = score + main : score = score + secondaryLastItem + main
 
    if (sign === '=' && secondaryLastItem === '=') {
-      const lastNumber = secondaryScreen[secondaryScreen.length - 2]
       const lastOperationSign = secondaryScreen[secondaryScreen.length - 3]
+      const lastNumber = secondaryScreen[secondaryScreen.length - 2]
+
       if (secondaryScreen.length === 2) {
          score = mainScreen
          secondary = [mainScreen, '=']
@@ -68,7 +83,7 @@ export const handleOperation = (context, sign) => {
          score = `(${mainScreen})` + lastOperationSign + lastNumber
          secondary = [mainScreen, lastOperationSign, lastNumber, '=']
       }
-   } else if ((sign === '*' || sign === '/') && secondaryScreen[secondaryScreen.length - 2] !== ')') {
+   } else if ((sign === '*' || sign === '/') && hasNoBracket) {
       secondary = ['(', ...secondaryScreen, main, ')', sign]
    } else {
       secondary = [...secondaryScreen, main, sign]
@@ -77,44 +92,51 @@ export const handleOperation = (context, sign) => {
    score = eval(score)
    score = score.toString()
 
-   setSecondaryScreen(secondary)
    setMainScreen(score)
+   setSecondaryScreen(secondary)
    setResetMain(true)
 }
 
 export const handlePercent = (context) => {
    const { mainScreen, setMainScreen, secondaryScreen, setSecondaryScreen, setResetMain } = context
-   if (mainScreen && secondaryScreen.length >= 2) {
-      if (secondaryScreen[secondaryScreen.length - 1] === '=') return
+   const secondaryLastItem = secondaryScreen[secondaryScreen.length - 1]
 
-      let lastScore = (secondaryScreen.slice(0, -1))
-      lastScore = lastScore.join('')
-      lastScore = eval(lastScore)
+   if (secondaryLastItem === '=' || !mainScreen || secondaryScreen.length < 2) return
 
-      let percent = Number(mainScreen) * 0.01 * lastScore
-      percent = percent.toString()
+   let prevScore = (secondaryScreen.slice(0, -1))
+   prevScore = prevScore.join('')
+   prevScore = eval(prevScore)
 
-      let score = secondaryScreen.join('') + percent
-      score = eval(score)
-      score = score.toString()
+   let percent = Number(mainScreen) * 0.01 * prevScore
+   percent = percent.toString()
 
-      setSecondaryScreen([...secondaryScreen, percent, '='])
-      setMainScreen(score)
-      setResetMain(true)
-   }
+   let score = secondaryScreen.slice(0, -1)
+   score = score.join('')
+   score = `(${score})` + secondaryLastItem + percent
+   score = eval(score)
+   score = score.toString()
+
+   setMainScreen(score)
+   setSecondaryScreen([...secondaryScreen, percent, '='])
+   setResetMain(true)
+
 }
 
 export const handleFraction = (context) => {
    const { mainScreen, setMainScreen, secondaryScreen, setSecondaryScreen, setResetMain } = context
-   if (!mainScreen || mainScreen === '0' || mainScreen[mainScreen.length - 1] === '.') return
+   const mainLastItem = mainScreen[mainScreen.length - 1]
+   const secondaryLastItem = secondaryScreen[secondaryScreen.length - 1]
 
-   let score = `1/${mainScreen}`
+   if (!mainScreen || mainScreen === '0' || mainLastItem === '.') return
+
+   let score
    let secondary
 
-   if (secondaryScreen[secondaryScreen.length - 1] !== '=') {
-      score = secondaryScreen.join('') + score
+   if (secondaryLastItem !== '=') {
+      score = secondaryScreen.join('') + `1/${mainScreen}`
       secondary = [...secondaryScreen, `(1/${mainScreen})`, '=']
    } else {
+      score = `1/${mainScreen}`
       secondary = [`(1/${mainScreen})`, '=']
    }
 
@@ -128,16 +150,19 @@ export const handleFraction = (context) => {
 
 export const handleSquare = (context) => {
    const { mainScreen, setMainScreen, secondaryScreen, setSecondaryScreen, setResetMain } = context
-   if (!mainScreen || mainScreen === '0' || mainScreen[mainScreen.length - 1] === '.') return
+   const mainLastItem = mainScreen[mainScreen.length - 1]
+   const secondaryLastItem = secondaryScreen[secondaryScreen.length - 1]
 
+   if (!mainScreen || mainScreen === '0' || mainLastItem === '.') return
 
-   let score = `Math.pow(${mainScreen}, 2)`
+   let score
    let secondary
 
-   if (secondaryScreen[secondaryScreen.length - 1] !== '=') {
-      score = secondaryScreen.join('') + score
+   if (secondaryLastItem !== '=') {
+      score = secondaryScreen.join('') + `Math.pow(${mainScreen}, 2)`
       secondary = [...secondaryScreen, `Math.pow(${mainScreen}, 2)`, '=']
    } else {
+      score = `Math.pow(${mainScreen}, 2)`
       secondary = [`Math.pow(${mainScreen}, 2)`, '=']
    }
 
@@ -152,15 +177,19 @@ export const handleSquare = (context) => {
 
 export const handleSquareRoot = (context) => {
    const { mainScreen, setMainScreen, secondaryScreen, setSecondaryScreen, setResetMain } = context
-   if (!mainScreen || mainScreen === '0' || mainScreen[mainScreen.length - 1] === '.') return
+   const mainLastItem = mainScreen[mainScreen.length - 1]
+   const secondaryLastItem = secondaryScreen[secondaryScreen.length - 1]
 
-   let score = `Math.sqrt(${mainScreen})`
+   if (!mainScreen || mainScreen === '0' || mainLastItem === '.') return
+
+   let score
    let secondary
 
-   if (secondaryScreen[secondaryScreen.length - 1] !== '=') {
-      score = secondaryScreen.join('') + score
+   if (secondaryLastItem !== '=') {
+      score = secondaryScreen.join('') + `Math.sqrt(${mainScreen})`
       secondary = [...secondaryScreen, `Math.sqrt(${mainScreen})`, '=']
    } else {
+      score = `Math.sqrt(${mainScreen})`
       secondary = [`Math.sqrt(${mainScreen})`, '=']
    }
 
@@ -174,18 +203,27 @@ export const handleSquareRoot = (context) => {
 }
 
 export const handleDeletion = (context) => {
-   const { mainScreen, setMainScreen, setSecondaryScreen, resetMain } = context
-   if (resetMain) return setSecondaryScreen([])
+   const { mainScreen, setMainScreen, secondaryScreen, setSecondaryScreen, resetMain } = context
+   const secondaryLastItem = secondaryScreen[secondaryScreen.length - 1]
+
    if (!mainScreen) return
-   if (mainScreen === '0.') return setMainScreen('')
-   setMainScreen(mainScreen.slice(0, -1))
+
+   if (secondaryScreen.length > 0 && resetMain && secondaryLastItem === '=') {
+      setSecondaryScreen([])
+   } else if (mainScreen === '0.') {
+      setMainScreen('')
+   } else if (!resetMain) {
+      setMainScreen(mainScreen.slice(0, -1))
+   }
 }
 
 export const handleClearEntry = (context) => {
    const { mainScreen, setMainScreen, secondaryScreen, setSecondaryScreen } = context
+   const secondaryLastItem = secondaryScreen[secondaryScreen.length - 1]
+
    if (!mainScreen) return
-   if (secondaryScreen.length === 0) return setMainScreen('')
-   if (secondaryScreen[secondaryScreen.length - 1] === '=') {
+
+   if (secondaryLastItem === '=') {
       setSecondaryScreen([])
       setMainScreen('')
    } else {
@@ -195,7 +233,9 @@ export const handleClearEntry = (context) => {
 
 export const handleClearAll = (context) => {
    const { mainScreen, setMainScreen, secondaryScreen, setSecondaryScreen } = context
+
    if (!mainScreen && secondaryScreen.length === 0) return
+
    setMainScreen('')
    setSecondaryScreen([])
 }

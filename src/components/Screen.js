@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { MainScreenContext, SecondaryScreenContext } from '../ContextStore'
+import { MainScreenContext, SecondaryScreenContext } from '../store/ContextStore'
 
 const Screen = () => {
    const [mainScreen] = useContext(MainScreenContext)
