@@ -1,6 +1,7 @@
 import React from 'react';
 import './styles/App.css';
-import logo from './images/logo.svg';
+import divcraftLogo from './images/logo.svg';
+import githubLogo from './images/GitHub-Mark-64px.png';
 import { ContextStore } from './store/ContextStore'
 
 import Screen from './components/Screen';
@@ -10,8 +11,14 @@ function App() {
   return (
     <ContextStore>
       <div className="wrapper">
-        <header>
-          <img className='logo' src={logo} alt="logo" />
+        <header className='header'>
+
+          <a href="https://github.com/divcraft" TARGET="_blank">
+            <img className='logo divcraft-logo' src={divcraftLogo} alt="div-craft logo" />
+          </a>
+          <a href="https://github.com/divcraft/calculator" TARGET="_blank">
+            <img className='logo github-logo' src={githubLogo} alt="github logo" />
+          </a>
         </header>
         <section className="calculator">
           <Screen />
